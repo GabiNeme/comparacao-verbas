@@ -1,0 +1,2 @@
+pandas==1.5.2
+datacompy==0.8.4
