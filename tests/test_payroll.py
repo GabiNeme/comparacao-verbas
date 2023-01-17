@@ -1,6 +1,49 @@
 import pandas as pd
 
-from src.payroll import AerosPayroll, ArtePayroll
+from src.payment_groups import PaymentGroups
+from src.payroll import AerosPayroll, ArtePayroll, Payroll
+
+
+class PayrollStub(Payroll):
+    def __init__(self):
+        payroll = {
+            'cm': [1, 1,    1,    1,     2,    2],
+            'verba': ['3000', '1000', '1010', '2000', '2000', '2020'],
+            'valor': [1000, 1000, 1000, 1000,    0,    0],
+        }
+
+        self.df = pd.DataFrame(data=payroll)
+
+
+class PaymentGroupsStub(PaymentGroups):
+    def __init__(self) -> None:
+        groups = {
+            '1000': 'G1',
+            '1010': 'G1',
+            '2000': 'G2',
+            '2020': 'G2',
+        }
+
+        self.groups = groups
+
+
+class TestPayroll:
+    def test_apply(payment_groups: PaymentGroups):
+
+        payroll = PayrollStub()
+        payment_groups = PaymentGroupsStub()
+
+        payroll.apply(payment_groups=payment_groups)
+
+        expected_data = {
+            'cm':    [1,    1,    1,    1,    2,    2],
+            'verba': ['3000', '1000', '1010', '2000', '2000', '2020'],
+            'valor': [1000, 1000, 1000, 1000,    0,    0],
+            'grupo': [None, 'G1', 'G1', 'G2', 'G2', 'G2'],
+        }
+        expected_df = pd.DataFrame(data=expected_data)
+
+        assert expected_df.equals(payroll.get())
 
 
 class TestAerosPayroll:
@@ -9,13 +52,14 @@ class TestAerosPayroll:
 
         expected_data = {
             'cm': [1, 1, 2, 2],
-            'verba': [1000, 1111, 1000, 1112],
+            'verba': ['1000', '0111', '1000', '1112'],
             'valor': [0, 0, 0.01, 197.28],
         }
         expected_df = pd.DataFrame(data=expected_data)
 
         aeros_payroll = AerosPayroll()
         aeros_payroll.load_from_file(file)
+
         assert expected_df.equals(aeros_payroll.get())
 
 
@@ -25,11 +69,12 @@ class TestArtePayroll:
 
         expected_data = {
             'cm': [1, 1, 2, 2],
-            'verba': [1000, 1112, 1000, 1111],
+            'verba': ['1000', '0112', '1000', '1111'],
             'valor': [0, 0, 0.02, 197.28],
         }
         expected_df = pd.DataFrame(data=expected_data)
 
         aeros_payroll = ArtePayroll()
         aeros_payroll.load_from_file(file)
+
         assert expected_df.equals(aeros_payroll.get())

@@ -1,5 +1,7 @@
 import pandas as pd
 
+from src.payment_groups import PaymentGroups
+
 
 class Payroll:
     def __init__(self) -> None:
@@ -11,10 +13,13 @@ class Payroll:
     def get(self):
         return self.df
 
+    def apply(self, payment_groups: PaymentGroups):
+        self.df['grupo'] = self.df['verba'].map(payment_groups.get())
+
 
 class AerosPayroll(Payroll):
     def load_from_file(self, file):
-        self.df = pd.read_csv(file, sep=';')
+        self.df = pd.read_csv(file, sep=';', dtype={'verba': 'object'})
 
         # remove last empty column
         self.df = self.df.drop(self.df.columns[3], axis=1)
@@ -22,4 +27,4 @@ class AerosPayroll(Payroll):
 
 class ArtePayroll(Payroll):
     def load_from_file(self, file):
-        self.df = pd.read_csv(file)
+        self.df = pd.read_csv(file, dtype={'verba': 'object'})
