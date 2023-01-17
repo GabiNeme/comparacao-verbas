@@ -7,9 +7,12 @@ class TestPaymentGroups:
         file = 'tests/fixture/groups.csv'
 
         expected_groups = {
-            'GRUPO1': ['1000', '1010'],
-            'GRUPO2': ['2U33', '2U01'],
-            'GRUPO3': ['1111', '1112'],
+            '1000': 'GRUPO1',
+            '1010': 'GRUPO1',
+            '2U33': 'GRUPO2',
+            '2U01': 'GRUPO2',
+            '1111': 'GRUPO3',
+            '1112': 'GRUPO3',
         }
         payment_groups = PaymentGroups()
         payment_groups.load_from_file(file)
