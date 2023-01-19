@@ -5,8 +5,10 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
-    -   id: double-quote-string-fixer
-
+-   repo: https://github.com/psf/black
+    rev: stable
+    hooks:
+    - id: black
 -   repo: https://github.com/pycqa/isort
     rev: 5.5.2
     hooks:
@@ -15,3 +17,6 @@ repos:
     rev: 6.0.0
     hooks:
     -   id: flake8
+        args: # arguments to configure flake8
+            # making isort line length compatible with black
+            - "--max-line-length=88"
