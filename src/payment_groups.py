@@ -1,9 +1,7 @@
-
 import pandas as pd
 
 
 class PaymentGroups:
-
     def __init__(self) -> None:
         self.groups = {}
 

@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src.payment_groups import PaymentGroups
-from src.payroll import AerosPayroll, ArtePayroll
+from src.payroll import AerosPayroll, ArtePayroll, Columns
 
 
 class Comparator:
@@ -27,9 +27,20 @@ class Comparator:
         df_have_group = self._compute_rows_with_group()
 
         df = pd.concat([df_dont_have_group, df_have_group], ignore_index=True)
-        df["igual"] = df["igual"].astype("bool")
-        df = df.sort_values(by=["cm", "grupo", "verba"])
-        df = df[["cm", "grupo", "verba", "valor_arte", "valor_aeros", "igual"]]
+        df[Columns.EQUAL.value] = df[Columns.EQUAL.value].astype('bool')
+        df = df.sort_values(
+            by=[Columns.CM.value, Columns.GROUP.value, Columns.FUND.value]
+        )
+        df = df[
+            [
+                Columns.CM.value,
+                Columns.GROUP.value,
+                Columns.FUND.value,
+                Columns.ARTE_VALUE.value,
+                Columns.AEROS_VALUE.value,
+                Columns.EQUAL.value,
+            ]
+        ]
         df = df.reset_index(drop=True)
 
         return df
@@ -40,29 +51,41 @@ class Comparator:
             self.merged = pd.merge(
                 self._arte_payroll.get(),
                 self._aeros_payroll.get(),
-                how="outer",
-                suffixes=("_arte", "_aeros"),
-                on=["cm", "verba", "grupo"],
+                how='outer',
+                suffixes=('_arte', '_aeros'),
+                on=[Columns.CM.value, Columns.FUND.value, Columns.GROUP.value],
             )
-            self.merged["valor_arte"] = self.merged["valor_arte"].fillna(0)
-            self.merged["valor_aeros"] = self.merged["valor_aeros"].fillna(0)
+            self.merged[Columns.ARTE_VALUE.value] = self.merged[
+                Columns.ARTE_VALUE.value
+            ].fillna(0)
+            self.merged[Columns.AEROS_VALUE.value] = self.merged[
+                Columns.AEROS_VALUE.value
+            ].fillna(0)
 
     def _compute_rows_without_group(self):
 
-        df = self.merged[self.merged["grupo"].isnull()].copy()
-        df.loc[:, "igual"] = df["valor_arte"] == df["valor_aeros"]
+        df = self.merged[self.merged[Columns.GROUP.value].isnull()].copy()
+        df.loc[:, Columns.EQUAL.value] = (
+            df[Columns.ARTE_VALUE.value] == df[Columns.AEROS_VALUE.value]
+        )
 
         return df
 
     def _compute_rows_with_group(self):
 
-        df = self.merged[self.merged["grupo"].notnull()].copy()
+        df = self.merged[self.merged[Columns.GROUP.value].notnull()].copy()
 
-        df_sum = df.groupby(["cm", "grupo"]).sum(numeric_only=True)
-        df_sum["igual"] = df_sum["valor_arte"] == df_sum["valor_aeros"]
+        df_sum = df.groupby([Columns.CM.value, Columns.GROUP.value]).sum(
+            numeric_only=True
+        )
+        df_sum[Columns.EQUAL.value] = (
+            df_sum[Columns.ARTE_VALUE.value] == df_sum[Columns.AEROS_VALUE.value]
+        )
 
         for index, row in df_sum.iterrows():
-            criteria = (df["cm"] == index[0]) & (df["grupo"] == index[1])
-            df.loc[criteria, "igual"] = row["igual"]
+            criteria = (df[Columns.CM.value] == index[0]) & (
+                df[Columns.GROUP.value] == index[1]
+            )
+            df.loc[criteria, Columns.EQUAL.value] = row[Columns.EQUAL.value]
 
         return df
