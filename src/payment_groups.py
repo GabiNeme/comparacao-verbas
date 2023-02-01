@@ -7,7 +7,7 @@ class PaymentGroups:
 
     def load_from_file(self, file):
 
-        df = pd.read_csv(file, sep=';')
+        df = pd.read_csv(file, sep=';', dtype='object')
 
         for _, row in df.iterrows():
             self.groups[row['Verba']] = row['Grupo']
