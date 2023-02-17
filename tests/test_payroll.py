@@ -27,8 +27,20 @@ class PaymentGroupsStub(PaymentGroups):
         self.groups = groups
 
 
+class PaymentGroupsWithIgnoreGroupStub(PaymentGroups):
+    def __init__(self) -> None:
+        groups = {
+            '1000': 'G1',
+            '1010': 'IGNORE',
+            '2000': 'IGNORE',
+            '2020': 'G2',
+        }
+
+        self.groups = groups
+
+
 class TestPayroll:
-    def test_apply(payment_groups: PaymentGroups):
+    def test_apply(self):
 
         payroll = PayrollStub()
         payment_groups = PaymentGroupsStub()
@@ -40,6 +52,22 @@ class TestPayroll:
             Columns.FUND.value: ['3000', '1000', '1010', '2000', '2000', '2020'],
             Columns.VALUE.value: [1000, 1000, 1000, 1000, 0, 0],
             Columns.GROUP.value: [None, 'G1', 'G1', 'G2', 'G2', 'G2'],
+        }
+        expected_df = pd.DataFrame(data=expected_data)
+
+        assert expected_df.equals(payroll.get())
+
+    def test_remove_group_ignore(self):
+        payroll = PayrollStub()
+        payment_groups = PaymentGroupsWithIgnoreGroupStub()
+
+        payroll.apply(payment_groups=payment_groups)
+
+        expected_data = {
+            Columns.CM.value: [1, 1, 2],
+            Columns.FUND.value: ['3000', '1000', '2020'],
+            Columns.VALUE.value: [1000, 1000, 0],
+            Columns.GROUP.value: [None, 'G1', 'G2'],
         }
         expected_df = pd.DataFrame(data=expected_data)
 

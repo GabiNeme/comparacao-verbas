@@ -19,9 +19,6 @@ class Payroll:
     def __init__(self) -> None:
         self.df = None
 
-    def load_from_file(self, file):
-        pass
-
     def get(self):
         return self.df
 
@@ -29,6 +26,13 @@ class Payroll:
         self.df[Columns.GROUP.value] = self.df[Columns.FUND.value].map(
             payment_groups.get()
         )
+        self._remove_group_IGNORE()
+
+    def _remove_group_IGNORE(self):
+        self.df.drop(
+            self.df.loc[self.df[Columns.GROUP.value] == 'IGNORE'].index, inplace=True
+        )
+        self.df.reset_index(drop=True, inplace=True)
 
 
 class AerosPayroll(Payroll):
