@@ -79,7 +79,7 @@ class Comparator:
             numeric_only=True
         )
         df_sum[Columns.EQUAL.value] = (
-            df_sum[Columns.ARTE_VALUE.value] == df_sum[Columns.AEROS_VALUE.value]
+            abs(df_sum[Columns.ARTE_VALUE.value] - df_sum[Columns.AEROS_VALUE.value]) < 0.001
         )
 
         for index, row in df_sum.iterrows():
