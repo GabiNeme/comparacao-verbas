@@ -58,7 +58,7 @@ WHERE
 	TIPO_MOVIMENTO = 'ME' AND
 	ANO_MES_REFERENCIA = TO_DATE([data], 'DD/MM/YYYY') AND
     valor_verba > 0
-GROUP codigo_contrato , codigo_verba ;
+GROUP BY codigo_contrato , codigo_verba ;
 ```
 Depois de executar, salve como arquivo como `CSV with headers` com um nome qualquer e no diretório que desejar.
 
@@ -96,7 +96,11 @@ Então execute:
 ```
 python main.py <diretorio_csv_arte> <diretorio_csv_aeros> <diretorio_salvar>
 ```
-Exemplo:
+Por exemplo, se os arquivos CSV do Arte e do Aeros estiverem dentro da pasta do código, basta executar:
+```
+python main.py arte.csv aeros.csv resultado.csv
+```
+Se desejar executar o código com os arquivos CSV em outro diretório, obtenha a localização desses arquivos e execute algo como:
 ```
 python main.py '\\cmbhfs.cmbh.mg.gov.br\rh\DIVPESCOMUM\Comparação folhas\arte.csv' '\\cmbhfs.cmbh.mg.gov.br\rh\DIVPESCOMUM\Comparação folhas\aeros.csv' '\\cmbhfs.cmbh.mg.gov.br\rh\DIVPESCOMUM\Comparação folhas\resultado.csv'
 ```
